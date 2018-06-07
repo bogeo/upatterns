@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pattern Language Markup Language (PLML) -->
+<!-- Change log:
+v.1.1.2_extended by Benno 07/09/2017
+      - added formalization element to add descriptions according to Christin's pattern description language
+      - added html and img sub-elements to the illustration element (just for test purposes)
+      - defined pattern-links 
+as sub-elements of related-patterns
+v.1.1.2 by Susan 26/05/2003.
+      - added collection to pattern (for consistency with pattern-link)
+v.1.1.1 by Jan, Susan 27/04/2003.
+      - changed order of elements
+      - added change-log in management
+
+v.1.1 by Martijn 21/04/2003. 
+      - Relaxed datatypes so that pattern-link can be used almost everywhere.
+      - pattern-link was extended to include new attributes collection and label
+      - Renamed ID to patternID
+
+v.1.0 by Xavier 07/04/2003. 
+      - Initial draft.
+-->
+<!ELEMENT pattern (name?, confidence?, alias*, synopsis?, illustration?, context?, problem?, forces?, evidence?, solution?, diagram?, formalization?,implementation?, related-patterns?, literature?, management?)>
+<!ATTLIST pattern
+	patternID CDATA #REQUIRED
+	collection CDATA #REQUIRED
+>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT confidence (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
+<!ELEMENT synopsis (#PCDATA)>
+<!ELEMENT illustration (html?)>
+<!ELEMENT html (img)>
+<!ATTLIST html
+          xmlns CDATA #IMPLIED>
+<!ELEMENT img ANY>
+<!ATTLIST img
+          src CDATA #REQUIRED>
+<!ELEMENT context EMPTY>
+<!ATTLIST context
+          mylabel CDATA #IMPLIED>
+<!ELEMENT problem (#PCDATA)>
+<!ELEMENT forces ANY>
+<!ELEMENT evidence (example*, rationale?)>
+<!ELEMENT example ANY>
+<!ELEMENT rationale ANY>
+<!ELEMENT solution ANY>
+<!ELEMENT diagram ANY>
+<!ELEMENT formalization ANY>
+<!ELEMENT implementation ANY>
+<!ELEMENT related-patterns (pattern-link*)>
+<!ELEMENT pattern-link EMPTY>
+<!ATTLIST pattern-link
+	type CDATA #REQUIRED
+	patternID CDATA #REQUIRED	
+	collection CDATA #REQUIRED
+	label CDATA #REQUIRED
+>
+<!ELEMENT management (author?, revision-number?, creation-date?, last-modified?, change-log?, credits?)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT creation-date (#PCDATA)>
+<!ELEMENT credits (#PCDATA)>
+<!ELEMENT revision-number (#PCDATA)>
+<!ELEMENT last-modified (#PCDATA)>
+<!ELEMENT literature ANY>
