@@ -1,0 +1,70 @@
+  <!--- PLML 1.1.2 extended version, see https://github.com/bogeo/upatterns/plml/plml_1.1.2_extended.dtd for further details. --> 
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="pattern">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="1" minOccurs="0" name="name" type="xs:string"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="alias" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="illustration"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="problem" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="context" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="forces"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="solution"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="synopsis" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="diagram"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="evidence" type="xs:string">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="0" name="example"/>
+							<xs:element maxOccurs="1" minOccurs="0" name="rationale"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="confidence" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="literature"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="implementation"/>
+				<xs:element name="formalization" type="xs:string"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="related-patterns">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="0" name="pattern-link">
+								<xs:annotation>
+									<xs:documentation>Pre defined PLML relation type:  Pattern relation according to Christin&apos;&apos;s description language:</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="type" type="xs:string" use="required"/>
+											<xs:attribute name="patternID" type="xs:integer" use="required"/>
+											<xs:attribute name="collection" type="xs:string" use="required"/>
+											<xs:attribute name="label" type="xs:string" use="required"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="pattern-link">
+					<xs:attribute name="type" type="xs:string"/>
+					<xs:attribute form="qualified" name="patternID" type="xs:integer"/>
+					<xs:attribute name="collection" type="xs:string"/>
+					<xs:attribute name="label" type="xs:string"/>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="management">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="1" minOccurs="0" name="author" type="xs:string"/>
+							<xs:element maxOccurs="1" minOccurs="0" name="revision-number" type="xs:string"/>
+							<xs:element maxOccurs="1" minOccurs="0" name="creation-date" type="xs:string"/>
+							<xs:element maxOccurs="1" minOccurs="0" name="last-modified" type="xs:string"/>
+							<xs:element maxOccurs="1" minOccurs="0" name="credits" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute form="qualified" name="patternID" type="xs:integer"/>
+			<xs:attribute name="collection" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
