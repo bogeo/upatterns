@@ -1,0 +1,424 @@
+/* 
+   Experimental Usability-Pattern Description Language
+
+   Scope: 
+     Usability patterns for geo-spatial Web-applications
+   Source: 
+     Dissertation Christin Henzen, TU Dresden, Dec. 2016 
+   Implementation for javacc 5.0: 
+     Benno Schmidt, Bochum University of Applied Sciences, July 2017
+
+   Note: The source-code comprises of the single file CUPDL.jjt only!
+   All the other software artifacts will be automatically generated from 
+   this source file.
+
+   To generate the parser from the command-line, follow these steps:
+   1. Set your Java environment, for UNIX/Linux systems:
+        PATH=$JAVA_HOME/bin:$JAVACC_HOME/bin:$PATH
+        CLASSPATH=.:$JAVACC_HOME/bin/lib/javacc.jar
+      For Windows systems:
+        PATH=%JAVA_HOME%\bin;%JAVACC_HOME%\bin;$PATH
+        set CLASSPATH=.;%JAVACC_HOME%\bin\lib\javacc.jar
+   2. Generate the runnable parser:
+        jjtree EUPDL.jjt
+        javacc EUPDL.jj
+        javac EUPDL.java
+   3. Optionally you might want to generate a HTML documentation:
+        jjdoc EUPDL.jjt 
+   4. Run the examples:
+        java EUPDL < pattern42
+        java EUPDL < pattern43
+        ...
+*/
+
+PARSER_BEGIN(EUPDL)
+
+public class EUPDL 
+{
+  public static void main(String[] args) 
+  {
+    try {
+      EUPDL parser = new EUPDL(System.in);
+      switch (parser.P()) {
+        default: 
+          System.out.println("Syntax is okay");
+          ((SimpleNode) jjtree.rootNode()).dump("  ");
+        case 0: 
+          break;
+        case 1: 
+          System.exit(0);
+      }
+    } catch (Throwable e) {
+      System.out.println("Syntax check failed: " + e.getMessage());
+      e.printStackTrace(); 
+      System.exit(1);
+    }
+  }
+}
+
+PARSER_END(EUPDL)
+
+SKIP:  { " " | "\t" | "\n" | "\r" }
+
+// <b>Note:</b> Tokens given in lowercase are necessary for implementational reasons only.
+// To avoid these tokens, maybe other brackets than rounded brackets could be used in the future (?), 
+// e.g. "{CLICK}[MAP]&lt;s&gt;" instead of "interfaced CLICK ( resourced MAP ( res_var s ) )".
+
+TOKEN: { 
+  "SPATIAL_EXTENT" | "TEMPORAL_EXTENT" | "TOPIC_CATEGORY" | "FURTHER_CONTEXT" | // Rule (1)
+  "DATASET" | "SERVICE" | "CITATION" | "METADATA" |  // (2)
+  "IS_SOURCE_OF" | "IS_CHILD_OF" | "IS_COUPLED_RESOURCE_OF" | // (3)
+  "MAP" | "LEGEND" | "RESULT" | "TABLE_OF_CONTENT" | "SEARCH_INPUT" | "RESULT_LIST" | 
+    "ADVANCED_SEARCH" | // (4)
+  "ABOVE" | "BELOW" | "ON_THE_LEFT_OF" | "ON_THE_RIGHT_OF" | "IN" | "OVER" | "NEXT_TO" | // (5)
+  "CLICK" | "DOUBLE_CLICK" | "RIGHT_CLICK" | "DRAG" | "DROP" | "MOUSE_OVER" | "MOUSE_OUT" | 
+    "KEY_DOWN" | // (6)
+  "SYNC" | "BEFORE" | "AFTER" | // (7)
+  "IS_SIMILAR_INTERACTION_TO" | "IS_EQUAL_INTERACTION_TO" | "LOOKS_SIMILAR_TO" | "LOOKS_EQUAL_TO" | 
+    "IS_DEPENDENT_ON" | "IS_COMPLEMENT_TO" | "IS_ALTERNATIVE_TO" | "IS_PART_OF" | "IS_SPECIALIZATION_OF" | 
+    "IS_RELATED_TO" | "IS_INCOMPATIBLE_TO" | "REALIZES_ANTI_SOLUTION_TO" | // (8), (8.1), (8.2)
+  <EXISTS: "EXISTS"> | 
+  <IMPLIES: "=>"> | 
+  <ELEM_OF: ":"> | 
+  "pattern:" | "res_var" | "ui_var" | 
+  ".r" | ".u" | ".i" | 
+  "precond:" | "internal" |
+  "type" | "information" | "navigation" | "function" |
+  "resourced" | "interfaced" | "lowered" |
+  <KEY: ["0"-"9"](["0"-"9"])?(["0"-"9"])?> | 
+  <NAME: (["A"-"Z","a"-"z","_"])(["A"-"Z","a"-"z","_","0"-"9"])*> |
+  "problem:" | "pattern-relations:" | 
+  <TEXT: (["A"-"Z","a"-"z","0"-"9","_"," ",".",",",";","'","-","(",")","\n","\r"])* "#">
+  }
+
+// (1)    Content 
+//        Note: In the following, for primitive non-terminals
+//        lowercase syntax will be used.
+
+void con():	
+  {}	
+  { "SPATIAL_EXTENT" | "TEMPORAL_EXTENT" | "TOPIC_CATEGORY" | "FURTHER_CONTEXT" 
+  }
+
+// (2)    Resource 
+
+void r():	
+  { Token t; }	
+  { (t = "DATASET" | t = "SERVICE" | t = "CITATION" | t = "METADATA") 
+      { System.out.println("Parsed resource \"" + t.image + "\", rule (2) r"); }
+  }
+
+// (3)    Resource relation 
+
+void rel_r():	
+  {}	
+  { "IS_SOURCE_OF" | "IS_CHILD_OF" | "IS_COUPLED_RESOURCE_OF" 
+  }
+  
+// (4)    User interface element 
+
+void uie():	
+  {}	
+  { "MAP" | "LEGEND" | "TABLE_OF_CONTENT" | "SEARCH_INPUT" | "RESULT_LIST" 
+  | "RESULT" | "ADVANCED_SEARCH" | Own_defined_UI_element() 
+  }
+
+// (4.1)  Own defined user interface element 
+
+void Own_defined_UI_element():	
+  { Token t; }	
+  { t = <NAME> // this should do for now...
+      { System.out.println("Parsed free defined element \""+ t.image + "\", rule (4.1) Own_defined_UI_element"); }     
+  }
+
+// (5)    User interface element relation 
+
+void rel_ui():	
+  {}	
+  { "ABOVE" | "BELOW" | "ON_THE_LEFT_OF" | "ON_THE_RIGHT_OF" | "IN" | "OVER" 
+  | "NEXT_TO" | "|"
+  }
+
+// (6)    User interaction 
+//        Note: If KEY_DOWN is used, a key code must be given.
+//        iae ::= 'CLICK' | 'DOUBLE_CLICK' | 'RIGHT_CLICK' 
+//        | 'DRAG' | 'DROP' | 'MOUSE_OVER' | 'MOUSE_OUT' 
+//        | 'KEY_DOWN' '(' &lt;KEY&gt; ')'
+//        <b>Note:</b> Rule has been modified (introduced KEY token).
+
+void iae():	
+  { Token t; }	
+  { ( t = "CLICK" | t = "DOUBLE_CLICK" | t = "RIGHT_CLICK" | t = "DRAG" | t = "DROP" | 
+      t = "MOUSE_OVER" | t = "MOUSE_OUT" | t = "KEY_DOWN" "(" <KEY> ")" )
+      { System.out.println("Parsed user interaction \""+ t.image + "\", rule (6) iae"); }     
+  }
+
+// (7)    User interaction relation 
+
+void rel_ia():	
+  {}	
+  { "SYNC" | "BEFORE" | "AFTER" | "|"
+  }
+
+// (8)    Pattern relation
+
+void rel_pat():	
+  {}	
+  { "IS_SIMILAR_INTERACTION_TO" | "IS_EQUAL_INTERACTION_TO" | "LOOKS_SIMILAR_TO" 
+  | "LOOKS_EQUAL_TO" | "IS_DEPENDENT_ON" | "IS_COMPLEMENT_TO" | "IS_ALTERNATIVE_TO" 
+  | "IS_PART_OF" | "IS_SPECIALIZATION_OF" | "IS_RELATED_TO" | "IS_INCOMPATIBLE_TO" 
+  | "REALIZES_ANTI_SOLUTION_TO"
+  }
+
+// (8.1)  Consistent UIE relation type 
+//        <b>Note:</b> This non-terminal is not used yet.  
+
+void rel_pat_ui():	
+  {}	
+  { "LOOKS_SIMILAR_TO" | "IS_COMPLEMENT_TO" | "IS_PART_OF" | "IS_SPECIALIZATION_OF" 
+  }
+
+// (8.2)  Consistent IA relation type
+//        <b>Note:</b> This non-terminal is not used yet.  
+
+void rel_pat_ia():	
+  {}	
+  { "IS_SIMILAR_INTERACTION_TO" | "IS_COMPLEMENT_TO" | "IS_ALTERNATIVE_TO" 
+  | "IS_PART_OF" | "IS_SPECIALIZATION_OF" 
+  }
+
+// (9)    Pattern (start symbol)
+//        Originally: P ::= [C_p] NAME '=' T [C_i]
+//        with NAME ::= (['A'-'Z','a'-'z','_'])+ 
+//        and P being an element of the pattern-collection COL. 
+//        (Here, the rule has been <b>extended</b> for experimental 
+//        purposes.)
+
+int P() :
+  { Token t; String s; }	
+  { [PROBL()]
+    [C_p()] 
+    "pattern:"
+    t = <NAME> 
+      { s = t.image; }
+    "=" 
+    T() 
+    [C_i()] 
+    [P_RELS()]
+    <EOF> 
+      { System.out.println("Parsed pattern \""+ s + "\", rule (9) P"); 
+        return -1;
+      }     
+  }
+
+// (10)   Preconditions 
+//        C_p ::= PREC | (PREC [',' | '|'] C_p)
+//        (slightly modified rule notation)
+
+void C_p():	
+  {}	
+  { "precond:" PREC() ( ["," | "|"] PREC() )*  
+  }
+
+// (10.1) Precondition 
+//        PREC ::= ['&lt;exists&gt;'] ( R | C | UI | IA | '.r' R rel_r R )
+//        <b>Note:</b> Rule has been modified 
+//        (added rounded brackets and replaced C by C_i).
+
+void PREC():	
+  {}	
+  { [ <EXISTS> ] ( R() | C_i() | UI() | IA() | relpair_res() ) 
+      { System.out.println("Parsed precondition, rule (10.1) PREC"); }
+  }
+       
+// (11)   Internal conditions 
+//        C_i ::= INTC | (INTC ',' C_i)   
+//        (slightly modified rule notation)
+
+void C_i():	
+  {}	
+  { "internal" 
+    INTC() 
+    ( LOOKAHEAD(2) "," INTC() )*
+  }
+
+// (11.1) Internal condition 
+//        INTC ::= '.u' UI rel_ui UI
+//        <b>Note:</b> Rule has been modified (replaced UIX by UI).
+
+void INTC():	
+  {}	
+  { relpair_ui()
+  }
+       
+// (12)   Pattern relation 
+//        with NAME ::= (['A'-'Z','a'-'z','_'])+ and the 
+//        pattern with the given name being element of the 
+//        pattern-collection COL.
+//        <b>Note</b>: Modified rule notation.
+
+void REL():	
+  {}	
+  { rel_pat() "(" <NAME> ")" 
+  }
+
+// (13)   Type
+//        Supported pattern types: 
+//        1. "Information" via basic user interface element, 
+//        2. "Navigation", and 
+//        3. "Function".
+
+void T():	
+  { }	
+  { "type" (INF() | NAV() | FUNC()) 
+  }
+
+// (14)   Information 
+
+void INF():	
+  {}	
+  { "information" UI()
+      { System.out.println("Pattern type: information, rule (14) INF"); }     
+  }
+     
+// (15)   Navigation 
+
+void NAV():	
+  {}	
+  {  "navigation" IA() <IMPLIES> UI() 
+      { System.out.println("Pattern type: navigation, rule (15) NAV"); }     
+  } 
+
+// (16)   Function 
+
+void FUNC():	
+  {}	
+  { "function" IA() <IMPLIES> func()  
+      { System.out.println("Pattern type: Function, rule (16) FUNC"); }     
+  }
+
+// (16.1) Function definition 
+//        <b>Note:</b> Rule has been extended.
+
+void func():	
+  {}	
+  { <NAME> [ "(" "resourced" UIX_r() ")" ]
+  }
+
+// (17)   User interface element 
+
+void UI():
+  {}
+  { UIX() | "resourced" UIX_r() 
+  }
+
+// (18)   Complex user interface element 
+//        UIX ::= uie | '.u' '(' UI rel_ui UI ')'
+//        <b>Note:</b> Rule has been modified 
+//        (replaced UIX by UI and variable instantiation).
+
+void UIX():
+  { Token t; String s = "<null>"; }	
+  { uie() 
+      { System.out.println("Parsed complex UI element, rule (18) UIX"); }
+  | relpair_ui() 
+      { System.out.println("Parsed complex UI element, rule (18) UIX"); }
+  | "ui_var" t = <NAME> ( <ELEM_OF> uie() )? 
+      { System.out.println("Parsed UI variable \"" + t.image + "\", rule (18) UIX"); }
+  }
+
+// (19)   Complex user interface element with resource 
+
+void UIX_r():
+  {}
+  { UIX() "(" R() ")"
+      { System.out.println("Parsed complex UI element with resource, rule (19) UIX_r"); }
+  }
+
+// (20)   Interaction (triggered by the user) 
+
+void IA():
+  {}
+  { LOOKAHEAD(4) IAX() 
+  | LOOKAHEAD(2) "interfaced" IAX_r()
+  }
+  
+// (21)   Complex interaction 
+//        IAX ::= iae ['(' UIX ')'] | '.i' IAX rel_ia IAX
+//        <b>Note:</b> Rule has been modified (replaced IAX by IA).
+
+void IAX():
+  {}
+  { iae() 
+  | "interfaced" iae() "(" UIX() ")" 
+  | relpair_ia() 
+      { System.out.println("Parsed complex interaction, rule (21) IAX"); }
+  }
+
+// (22)   Complex interaction with complex user interface 
+//        element with resource 
+
+void IAX_r():
+  {}
+  { IAX() "(" "resourced" UIX_r() ")" 
+      { System.out.println("Parsed complex interaction with UI, rule (22) IAX_r"); }
+  }
+
+// (23)   Resource 
+//        R ::= r | r '&lt;lowercase&gt;' con ['|' R]
+//        (slightly modified rule notation)
+
+void R():	
+  { Token t; String s = "<null>"; }	
+  { r() 
+      { System.out.println("Parsed resource, rule (23) R"); }
+  | "lowered" r() "/" con() 
+      { System.out.println("Parsed lowered resource, rule (23) R"); }
+  | "res_var" t = <NAME> ( <ELEM_OF> r() )? 
+      { System.out.println("Parsed resource variable \"" + t.image + "\", rule (23) R"); }
+  }
+
+// (24)   Helper elements
+//        Note that the the rounded brackets allow the 
+//        specification of nested relations.
+//
+// (24.1) Binary relation on resources 
+ 
+void relpair_res():
+  {}	
+  { ".r" "(" R() rel_r() R() ")"
+  }
+
+// (24.2) Binary relation on user interface elements 
+
+void relpair_ui():
+  {}	
+  { ".u" "(" UI() rel_ui() UI() ")"
+  }
+
+// (24.3) Binary relations on user interaction elements 
+
+void relpair_ia():
+  {}	
+  { ".i" "(" IA() rel_ia() IA() ")"
+  }
+
+// (25)  Problem description section
+//       (<b>Note</b>: Experimental grammar extension)
+
+void PROBL():	
+  {}	
+  { "problem:" <TEXT> 
+      { System.out.println("Found problem description..."); }
+  }
+
+// (26)  Pattern-relation specification section
+//       (<b>Note</b>: Experimental grammar extension)
+
+void P_RELS():	
+  {}	
+  { "pattern-relations:" 
+    REL() 
+    ( "," REL() )*
+      { System.out.println("Found pattern relation section..."); }
+  }
