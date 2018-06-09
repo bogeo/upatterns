@@ -1,0 +1,26 @@
+problem:
+  See Christin's thesis pp. 81-82 for the problem description. 
+  #
+
+precond:
+  EXISTS res_var d1 : DATASET,
+  EXISTS res_var s1 : SERVICE
+
+pattern: Map_link_in_detail_view =
+  type navigation
+
+  interfaced CLICK ( 
+    resourced 
+      .u (
+        .u (LINK | BUTTON) 
+          IN
+        .u (
+          resourced RESULT ( res_var d1 )
+            | 
+          DETAIL) 
+      ) 
+        ( res_var s1 ) 
+  )
+  => resourced MAP( res_var d1 )
+
+  internal .u (RESULT IN RESULT_LIST)
