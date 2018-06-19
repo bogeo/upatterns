@@ -4,7 +4,7 @@ Description language for usability patterns for geospatial applications
 ## Project Idea
 In this repository, you will find various software artifacts which might be helpful to develop a description language for usability patterns for geospatial applications. Note that this is work in progress! 
 
-## Functionality
+## Artifacts
 Currently, these artifacts are available:  
 - Adapted PLML ("pattern language markup language") schema definition
 - Parser for a simple pattern description language for geospatial applications (wirking title: "EUPDL")
